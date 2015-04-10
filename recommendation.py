@@ -52,20 +52,23 @@ def cosine_similarity(v1, v2):
         sumyy += y * y
     return sumxy/math.sqrt(sumxx*sumyy)
 
-def prediction(v1, v2, sim='cosine'):
-    assert len(v1) == len(v2) and len(v1) > 0
-    x_avg, y_avg = average(v1), average(v2)
+def prediction(user, item, sim='cosine'):
     numerator, denominator = 0, 0
-    for x,y in zip(v1, v2):
-        if x == 0 or y == 0:
+    v1 = [x[1] for x in user if x[1] != 0]
+    v2 = [v[item-1] for v in train.values() if v[item-1] != 0][:5]
+    print v2
+    for entry in train:
+        if train[entry][item-1] == 0:
             continue
+        user_avg = average(train[entry])
         if sim == 'cosine':
-            numerator += cosine_similarity(v1,v2) * (y - y_avg)
+            numerator += cosine_similarity(v1,v2) * (train[entry][item-1] - user_avg)
             denominator += abs(cosine_similarity(v1,v2))
         else:
-            numerator += pearson_coefficient(v1,v2) * (y - y_avg)
+            numerator += pearson_coefficient(v1,v2) * (train[entry][item-1] - user_avg)
             denominator += abs(pearson_coefficient(v1,v2))
-    return x_avg + (numerator/denominator)
+
+    return average(v1) + (numerator/denominator)
 
 
 
@@ -80,7 +83,7 @@ if __name__ == '__main__':
     #save training data
     with open('train.txt', 'r') as fr:
         for row, line in enumerate(fr):
-            train[row+1] = [int(x) for x in line.translate(None, '\r\n\t')]
+            train[row] = [int(x) for x in line.translate(None, '\r\n\t')]
 
     #store users ratings
     with open(args.input, 'r') as fr:
@@ -97,6 +100,5 @@ if __name__ == '__main__':
                 test[user] = [(int(movie), int(score))]
 
     #compute similarity
-    #pretty_print(prediction(train[1], train[10]))
+    pretty_print(prediction(test['201'], 237))
     #pretty_print(cosine_similarity(train[1], train[2]))
-    
