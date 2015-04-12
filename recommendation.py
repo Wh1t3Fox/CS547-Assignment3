@@ -6,6 +6,7 @@ Assignment 3
 import argparse
 import sys
 import math
+import numpy as np
 
 COLORS = {
     'PURPLE' : '\033[95m',
@@ -21,7 +22,6 @@ COLORS = {
 train = {}
 test = {}
 output_file = None
-
 
 average = lambda x: float(sum(x))/len(x)
 
@@ -52,24 +52,52 @@ def cosine_similarity(v1, v2):
         sumyy += y * y
     return sumxy/math.sqrt(sumxx*sumyy)
 
-def prediction(user, item, sim='cosine'):
+def prediction(user, sim='cosine'):
+    similar_users = []
+    v1 = [x[1] for x in test[user] if x[1] != 0]
+    v1_avg = average(v1)
     numerator, denominator = 0, 0
-    v1 = [x[1] for x in user if x[1] != 0]
-    v2 = [v[item-1] for v in train.values() if v[item-1] != 0][:5]
-    print v2
-    for entry in train:
-        if train[entry][item-1] == 0:
-            continue
-        user_avg = average(train[entry])
-        if sim == 'cosine':
-            numerator += cosine_similarity(v1,v2) * (train[entry][item-1] - user_avg)
-            denominator += abs(cosine_similarity(v1,v2))
-        else:
-            numerator += pearson_coefficient(v1,v2) * (train[entry][item-1] - user_avg)
-            denominator += abs(pearson_coefficient(v1,v2))
 
-    return average(v1) + (numerator/denominator)
+    for entry in test[user]:
+        #we need to predict the rating
+        if entry[1] == 0:
+            movie = entry[0]
+            for k, v in sorted(train.items()):
+                #if the train user hasn't rated the value skip
+                if v[movie] == 0:
+                    continue
+                else:
+                    #for the user get the first n movies
+                    #the user has rated, n is defined by
+                    #the number of movies rated by the test user
+                    tmpv = []
+                    for x in v:
+                        if len(tmpv) == len(v1):
+                            break
+                        elif x != 0:
+                            tmpv.append(x)
+                    if sim == 'cosine':
+                        similar_users.append((k, cosine_similarity(v1,tmpv)))
+                    else:
+                        similar_users.append((k, pearson_coefficient(v1,tmpv)))
+            similar_users.sort(key=lambda x: x[1],reverse=True)
 
+            if '5' in output_file:
+                for u in similar_users[:20]:
+                    v2 = [x for x in train[u[0]] if x != 0][:len(v1)]
+                    user_avg = average(v2)
+
+                    if sim == 'cosine':
+                        similarity = cosine_similarity(v1,v2)
+                        numerator += similarity * (train[u[0]][movie] - user_avg)
+                        denominator += abs(similarity)
+                    else:
+                        similarity = pearson_coefficient(v1,v2)
+                        numerator += similarity * (train[u[0]][movie] - user_avg)
+                        denominator += abs(similarity)
+
+                output = user + ' ' + str(movie) + ' ' + str(round(v1_avg + (numerator/denominator)))
+                pretty_print(output)
 
 
 
@@ -83,7 +111,7 @@ if __name__ == '__main__':
     #save training data
     with open('train.txt', 'r') as fr:
         for row, line in enumerate(fr):
-            train[row] = [int(x) for x in line.translate(None, '\r\n\t')]
+            train[row+1] = [int(x) for x in line.translate(None, '\r\n\t')]
 
     #store users ratings
     with open(args.input, 'r') as fr:
@@ -99,6 +127,8 @@ if __name__ == '__main__':
             except KeyError:
                 test[user] = [(int(movie), int(score))]
 
-    #compute similarity
-    pretty_print(prediction(test['201'], 237))
+    #compute similar between all users
+    for k in sorted(test):
+        #print k
+        prediction(k)
     #pretty_print(cosine_similarity(train[1], train[2]))
