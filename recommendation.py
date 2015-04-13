@@ -62,8 +62,10 @@ def prediction(user, sim='cosine'):
         #we need to predict the rating
         if entry[1] == 0:
             movie = entry[0]
+            #calculate similar users
             for k, v in sorted(train.items()):
                 #if the train user hasn't rated the value skip
+                print v[movie]
                 if v[movie] == 0:
                     continue
                 else:
@@ -82,22 +84,21 @@ def prediction(user, sim='cosine'):
                         similar_users.append((k, pearson_coefficient(v1,tmpv)))
             similar_users.sort(key=lambda x: x[1],reverse=True)
 
-            if '5' in output_file:
-                for u in similar_users[:20]:
-                    v2 = [x for x in train[u[0]] if x != 0][:len(v1)]
-                    user_avg = average(v2)
+            #Go through the similar users and calculate rating
+            for u,r in similar_users[:20]:
+                v2 = [x for x in train[u] if x != 0][:len(v1)]
+                user_avg = average(v2)
 
-                    if sim == 'cosine':
-                        similarity = cosine_similarity(v1,v2)
-                        numerator += similarity * (train[u[0]][movie] - user_avg)
-                        denominator += abs(similarity)
-                    else:
-                        similarity = pearson_coefficient(v1,v2)
-                        numerator += similarity * (train[u[0]][movie] - user_avg)
-                        denominator += abs(similarity)
+                if sim == 'cosine':
+                    similarity = cosine_similarity(v1,v2)
+                else:
+                    similarity = pearson_coefficient(v1,v2)
 
-                output = user + ' ' + str(movie) + ' ' + str(round(v1_avg + (numerator/denominator)))
-                pretty_print(output)
+                numerator += similarity * (train[u][movie] - user_avg)
+                denominator += abs(similarity)
+
+            output = user + ' ' + str(movie) + ' ' + str(round(v1_avg + (numerator/denominator)))
+            pretty_print(output)
 
 
 
@@ -128,7 +129,7 @@ if __name__ == '__main__':
                 test[user] = [(int(movie), int(score))]
 
     #compute similar between all users
-    for k in sorted(test):
+    #for k in sorted(test):
         #print k
-        prediction(k)
+    prediction('201')
     #pretty_print(cosine_similarity(train[1], train[2]))
