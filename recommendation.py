@@ -58,6 +58,7 @@ def prediction(user, sim='cosine'):
     numerator, denominator = 0, 0
 
     for movie, rating in test[user]:
+        movie -= 1
         #we need to predict the rating
         if rating == 0:
             #calculate similar users
@@ -129,7 +130,7 @@ if __name__ == '__main__':
                 test[user] = [(int(movie), int(score))]
 
     #compute similar between all users
-    #for k in sorted(test):
+    for k in sorted(test):
         #print k
-    prediction('202')
+        prediction(str(k))
     #pretty_print(cosine_similarity(train[1], train[2]))
