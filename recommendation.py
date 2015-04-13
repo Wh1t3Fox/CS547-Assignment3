@@ -53,7 +53,6 @@ def cosine_similarity(v1, v2):
     return sumxy/math.sqrt(sumxx*sumyy)
 
 def prediction(user, sim='cosine'):
-    similar_users = []
     v1 = [x[1] for x in test[user] if x[1] != 0]
     v1_avg = average(v1)
     numerator, denominator = 0, 0
@@ -62,9 +61,10 @@ def prediction(user, sim='cosine'):
         #we need to predict the rating
         if rating == 0:
             #calculate similar users
+            similar_users = []
             for k, v in sorted(train.items()):
                 #if the train user hasn't rated the value skip
-                if v[movie] == 0:
+                if int(v[movie]) == 0:
                     continue
                 else:
                     #for the user get the first n movies
@@ -80,6 +80,8 @@ def prediction(user, sim='cosine'):
                         similar_users.append((k, cosine_similarity(v1,tmpv)))
                     else:
                         similar_users.append((k, pearson_coefficient(v1,tmpv)))
+
+            #sort the users by descreaing similarity
             similar_users.sort(key=lambda x: x[1],reverse=True)
 
             #Go through the similar users and calculate rating
@@ -129,5 +131,5 @@ if __name__ == '__main__':
     #compute similar between all users
     #for k in sorted(test):
         #print k
-    prediction('201')
+    prediction('202')
     #pretty_print(cosine_similarity(train[1], train[2]))
