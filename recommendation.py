@@ -58,14 +58,12 @@ def prediction(user, sim='cosine'):
     v1_avg = average(v1)
     numerator, denominator = 0, 0
 
-    for entry in test[user]:
+    for movie, rating in test[user]:
         #we need to predict the rating
-        if entry[1] == 0:
-            movie = entry[0]
+        if rating == 0:
             #calculate similar users
             for k, v in sorted(train.items()):
                 #if the train user hasn't rated the value skip
-                print v[movie]
                 if v[movie] == 0:
                     continue
                 else:
