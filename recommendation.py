@@ -98,7 +98,7 @@ def prediction(user, sim='cosine'):
                 numerator += similarity * (train[u][movie] - user_avg)
                 denominator += abs(similarity)
 
-            output = user + ' ' + str(movie) + ' ' + str(round(v1_avg + (numerator/denominator)))
+            output = user + ' ' + str(movie+1) + ' ' + str(round(v1_avg + (numerator/denominator)))
             pretty_print(output)
 
 
