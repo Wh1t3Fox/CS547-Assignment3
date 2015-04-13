@@ -99,8 +99,7 @@ def prediction(user, sim='cosine'):
                 denominator += abs(similarity)
 
             output = user + ' ' + str(movie+1) + ' ' + str(round(v1_avg + (numerator/denominator)))
-            pretty_print(output)
-
+            yield output
 
 
 if __name__ == '__main__':
@@ -131,6 +130,6 @@ if __name__ == '__main__':
 
     #compute similar between all users
     for k in sorted(test):
-        #print k
-        prediction(str(k))
-    #pretty_print(cosine_similarity(train[1], train[2]))
+        results = prediction(str(k))
+        for rslt in results:
+            pretty_print(rslt)
