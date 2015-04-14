@@ -25,23 +25,26 @@ output_file = None
 
 average = lambda x: float(sum(x))/len(x)
 
-def manhattan(v1, v2):
-    distance = 0
-    total = 0
-    for x,y in zip(v1,v2):
-        distance += abs(x - rating2[y])
-        total += 1
-    if total > 0:
-        return distance / total
-    else:
-        return -1 #Indicates no ratings in common
-
 def pretty_print(message, color='GREEN'):
     if color.upper() in COLORS:
         print '{0}[+] {1}{2}'.format(COLORS[color.upper()], message, COLORS['ENDC'])
     else:
         print '{0}[-] ERROR: {1} is not in the color list!{2}'.format(COLORS['RED'], color, COLORS['ENDC'])
 
+#manhattan distance
+def manhattan(v1, v2):
+    distance = 0
+    total = 0
+    for key1,key2 in zip(v1,v2):
+        if key1 != 0 and key2 != 0:
+            distance += abs(key1 - key2)
+            total += 1
+    if total > 0:
+        return distance / total
+    else:
+        return -1 #Indicates no ratings in common
+
+#pearson coefficient
 def pearson_coefficient(v1, v2):
     assert len(v1) == len(v2) and len(v1) > 0
     sumxx, sumyy, sumxy = 0, 0, 0
@@ -54,6 +57,7 @@ def pearson_coefficient(v1, v2):
         sumyy += y * y
     return sumxy/math.sqrt(sumxx*sumyy)
 
+#cosine similarity
 def cosine_similarity(v1, v2):
     assert len(v1) == len(v2) and len(v1) > 0
     sumxx, sumxy, sumyy = 0, 0, 0
@@ -63,6 +67,7 @@ def cosine_similarity(v1, v2):
         sumyy += y * y
     return sumxy/math.sqrt(sumxx*sumyy)
 
+#prediction of a users non rated movies
 def prediction(user, sim='cosine'):
     v1 = [x[1] for x in test[user] if x[1] != 0]
     v1_avg = average(v1)
