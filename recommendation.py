@@ -25,6 +25,17 @@ output_file = None
 
 average = lambda x: float(sum(x))/len(x)
 
+def manhattan(v1, v2):
+    distance = 0
+    total = 0
+    for x,y in zip(v1,v2):
+        distance += abs(x - rating2[y])
+        total += 1
+    if total > 0:
+        return distance / total
+    else:
+        return -1 #Indicates no ratings in common
+
 def pretty_print(message, color='GREEN'):
     if color.upper() in COLORS:
         print '{0}[+] {1}{2}'.format(COLORS[color.upper()], message, COLORS['ENDC'])
