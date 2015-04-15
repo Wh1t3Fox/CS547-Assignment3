@@ -114,16 +114,24 @@ def prediction(user, sim='cosine'):
 
                 if sim == 'cosine':
                     similarity = cosine_similarity(v1,v2)
-                else:
+                elif sim == 'pearson':
                     similarity = pearson_coefficient(v1,v2)
+                elif sim == 'manhattan':
+                    similarity = manhattan(v1,tmpv)
 
                 numerator += similarity * (train[u][movie] - user_avg)
                 denominator += abs(similarity)
+
             if denominator == 0:
-                output = user + ' ' + str(movie+1) + ' ' + str(int(round(v1_avg + (0))))
+                value = int(round(v1_avg + (0)))
             else:
-                output = user + ' ' + str(movie+1) + ' ' + str(int(round(v1_avg + (numerator/denominator))))
-            yield output
+                value = int(round(v1_avg + (numerator/denominator)))
+
+            if value < 1:
+                value = 1
+            elif value > 5:
+                value = 5
+            yield user + ' ' + str(movie+1) + ' ' + str(value)
 
 
 if __name__ == '__main__':
@@ -155,7 +163,8 @@ if __name__ == '__main__':
     #compute similar between all users
     for k in sorted(test):
         #results = prediction(str(k), 'cosine') #cosine similarity
-        results = prediction(str(k), 'pearson') #pearson coefficient
+        #results = prediction(str(k), 'pearson') #pearson coefficient
+        results = prediction(str(k), 'manhattan') #pearson coefficient
         with open(output_file, 'a+') as fw:
             for rslt in results:
                 fw.write(rslt)
