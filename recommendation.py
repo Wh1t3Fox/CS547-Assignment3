@@ -72,7 +72,7 @@ def cosine_similarity(v1, v2):
 
 #prediction of a users non rated movies
 def prediction(user, sim='cosine'):
-    v1 = [x[1] for x in test[user] if x[1] != 0]
+    v1 = [x[1] for x in test[user] if x[1] != 0][:10]
     v1_avg = average(v1)
     numerator, denominator = 0, 0
 
@@ -96,6 +96,7 @@ def prediction(user, sim='cosine'):
                             break
                         elif x != 0:
                             tmpv.append(x)
+
                     if sim == 'cosine':
                         similar_users.append((k, cosine_similarity(v1,tmpv)))
                     else:
@@ -153,5 +154,8 @@ if __name__ == '__main__':
     for k in sorted(test):
         results = prediction(str(k), 'cosine') #cosine similarity
         #results = prediction(str(k), 'pearson') #pearson coefficient
-        for rslt in results:
-            pretty_print(rslt)
+        with open(output_file, 'a+') as fw:
+            for rslt in results:
+                fw.write(rslt)
+                fw.write("\n")
+                pretty_print(rslt)
