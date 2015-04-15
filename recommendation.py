@@ -55,7 +55,10 @@ def pearson_coefficient(v1, v2):
         sumxy += x * y
         sumxx += x * x
         sumyy += y * y
-    return sumxy/math.sqrt(sumxx*sumyy)
+    if math.sqrt(sumxx*sumyy) == 0:
+        return 0
+    else:
+        return sumxy/math.sqrt(sumxx*sumyy)
 
 #cosine similarity
 def cosine_similarity(v1, v2):
@@ -113,8 +116,10 @@ def prediction(user, sim='cosine'):
 
                 numerator += similarity * (train[u][movie] - user_avg)
                 denominator += abs(similarity)
-
-            output = user + ' ' + str(movie+1) + ' ' + str(int(round(v1_avg + (numerator/denominator))))
+            if denominator == 0:
+                output = user + ' ' + str(movie+1) + ' ' + str(int(round(v1_avg + (0))))
+            else:
+                output = user + ' ' + str(movie+1) + ' ' + str(int(round(v1_avg + (numerator/denominator))))
             yield output
 
 
@@ -146,6 +151,7 @@ if __name__ == '__main__':
 
     #compute similar between all users
     for k in sorted(test):
-        results = prediction(str(k))
+        results = prediction(str(k), 'cosine') #cosine similarity
+        #results = prediction(str(k), 'pearson') #pearson coefficient
         for rslt in results:
             pretty_print(rslt)
