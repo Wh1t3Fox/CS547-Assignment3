@@ -152,8 +152,8 @@ if __name__ == '__main__':
 
     #compute similar between all users
     for k in sorted(test):
-        results = prediction(str(k), 'cosine') #cosine similarity
-        #results = prediction(str(k), 'pearson') #pearson coefficient
+        #results = prediction(str(k), 'cosine') #cosine similarity
+        results = prediction(str(k), 'pearson') #pearson coefficient
         with open(output_file, 'a+') as fw:
             for rslt in results:
                 fw.write(rslt)
