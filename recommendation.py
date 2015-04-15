@@ -99,8 +99,10 @@ def prediction(user, sim='cosine'):
 
                     if sim == 'cosine':
                         similar_users.append((k, cosine_similarity(v1,tmpv)))
-                    else:
+                    elif sim == 'pearson':
                         similar_users.append((k, pearson_coefficient(v1,tmpv)))
+                    elif sim == 'manhattan':
+                        similar_users.append((k, manhattan(v1,tmpv)))
 
             #sort the users by descreaing similarity
             similar_users.sort(key=lambda x: x[1],reverse=True)
