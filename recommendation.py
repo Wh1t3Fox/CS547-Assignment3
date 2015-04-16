@@ -44,6 +44,16 @@ def manhattan(v1, v2):
     else:
         return -1 #Indicates no ratings in common
 
+#slope one calculation
+def slopeone(v1,v2,weight=False):
+    tmp = np.array([v1,v2])
+    deviation = np.std(tmp)
+    sumx = 0
+    for x, y in zip(v1,v2):
+        sumx += deviation + x
+
+    return  sumx/len(v1)
+
 #pearson coefficient
 def pearson_coefficient(v1, v2):
     assert len(v1) == len(v2) and len(v1) > 0
@@ -103,6 +113,8 @@ def prediction(user, sim='cosine'):
                         similar_users.append((k, pearson_coefficient(v1,tmpv)))
                     elif sim == 'manhattan':
                         similar_users.append((k, manhattan(v1,tmpv)))
+                    elif sim == 'slopeone':
+                        similar_users.append((k, slopeone(v1,tmpv,True)))
 
             #sort the users by descreaing similarity
             similar_users.sort(key=lambda x: x[1],reverse=True)
@@ -118,6 +130,8 @@ def prediction(user, sim='cosine'):
                     similarity = pearson_coefficient(v1,v2)
                 elif sim == 'manhattan':
                     similarity = manhattan(v1,tmpv)
+                elif sim == 'slopeone':
+                    similarity = slopeone(v1,tmpv)
 
                 numerator += similarity * (train[u][movie] - user_avg)
                 denominator += abs(similarity)
@@ -164,7 +178,8 @@ if __name__ == '__main__':
     for k in sorted(test):
         #results = prediction(str(k), 'cosine') #cosine similarity
         #results = prediction(str(k), 'pearson') #pearson coefficient
-        results = prediction(str(k), 'manhattan') #pearson coefficient
+        #results = prediction(str(k), 'manhattan') #manhattan
+        results = prediction(str(k), 'slopeone') #slope one
         with open(output_file, 'a+') as fw:
             for rslt in results:
                 fw.write(rslt)
